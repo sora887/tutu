@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>deepseek写的</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial Rounded MT Bold', 'Helvetica Rounded', Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ffcfe5 0%, #a6c1ee 100%);
+            color: #5a3d5c;
+            min-height: 100vh;
+            padding: 20px 15px 80px;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .title {
+            font-size: 1.8rem;
+            color: #ff6b9d;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .title i {
+            color: #ff9e6d;
+            font-size: 2rem;
+        }
+        
+        .subtitle {
+            font-size: 0.95rem;
+            color: #7d5a94;
+            margin-bottom: 15px;
+        }
+        
+        .cat-paw {
+            font-size: 1.5rem;
+            color: #ff9e6d;
+            letter-spacing: 5px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            padding: 12px;
+            margin: 15px 0 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ff6b9d;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #7d5a94;
+        }
+        
+        .category-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #7d5a94;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background: #ff9e6d;
+            color: white;
+            border-color: #ff6b9d;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .image-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .image-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .image-label {
+            padding: 10px;
+            font-size: 0.8rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            color: #7d5a94;
+        }
+        
+        .loading {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 30px;
+            font-size: 1.2rem;
+            color: #ff6b9d;
+        }
+        
+        .controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border-radius: 50px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ff6b9d 0%, #ff9e6d 100%);
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 107, 157, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.9);
+            color: #ff6b9d;
+            border: 2px solid #ff9e6d;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 107, 157, 0.4);
+        }
+        
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            max-width: 90%;
+            max-height: 80%;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .modal-content img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        .modal-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.5);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* 樱花动画 */
+        .sakura {
+            position: absolute;
+            top: -50px;
+            width: 25px;
+            height: 25px;
+            background: pink;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            opacity: 0.7;
+            z-index: -1;
+            animation: fall linear infinite;
+        }
+        
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+        
+        /* 猫咪动画 */
+        .cat {
+            position: absolute;
+            bottom: 70px;
+            width: 50px;
+            height: 30px;
+            background: #ff9e6d;
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            z-index: -1;
+            animation: walk 20s linear infinite;
+        }
+        
+        .cat:before, .cat:after {
+            content: '';
+            position: absolute;
+            background: #ff9e6d;
+            border-radius: 50%;
+        }
+        
+        .cat:before {
+            width: 15px;
+            height: 15px;
+            top: -8px;
+            left: 8px;
+            box-shadow: 20px 0 0 #ff9e6d;
+        }
+        
+        .cat:after {
+            width: 10px;
+            height: 12px;
+            bottom: -5px;
+            left: 10px;
+            box-shadow: 25px 0 0 #ff9e6d;
+        }
+        
+        @keyframes walk {
+            0% { left: -50px; }
+            100% { left: 100%; }
+        }
+        
+        /* 响应式设计 */
+        @media (min-width: 768px) {
+            .gallery {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .title {
+                font-size: 2.2rem;
+            }
+            
+            .cat {
+                width: 70px;
+                height: 40px;
+            }
+        }
+        
+        @media (min-width: 1024px) {
+            .gallery {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+        
+        /* 加载动画 */
+        .loader {
+            width: 40px;
+            height: 40px;
+            margin: 20px auto;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #ff6b9d;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="title"><i class="fas fa-cat"></i> 猫咪美图画廊 <i class="fas fa-heart"></i></h1>
+            <div class="subtitle">每日精选 · 单击放大 · 刷新换图</div>
+            <div class="cat-paw">🐾 🐾 🐾</div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="total-count">10</div>
+                    <div class="stat-label">总图片数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="category-count">5</div>
+                    <div class="stat-label">分类数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="refresh-count">0</div>
+                    <div class="stat-label">刷新次数</div>
+                </div>
+            </div>
+            
+            <div class="category-tabs">
+                <div class="tab active" data-category="all">全部图片</div>
+                <div class="tab" data-category="anime">二次元美少女</div>
+                <div class="tab" data-category="nsfw">二次元精选</div>
+                <div class="tab" data-category="scenery">风景摄影</div>
+                <div class="tab" data-category="beauty">三次元美女</div>
+            </div>
+        </header>
+        
+        <main>
+            <div class="gallery" id="gallery">
+                <!-- 图片将通过JavaScript动态加载 -->
+                <div class="loading">
+                    <div class="loader"></div>
+                    <p>正在加载精选美图...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div class="controls">
+        <button class="btn btn-primary" id="refresh-btn">
+            <i class="fas fa-sync-alt"></i> 刷新美图
+        </button>
+        <button class="btn btn-secondary" id="change-api-btn">
+            <i class="fas fa-random"></i> 切换API源
+        </button>
+    </div>
+    
+    <!-- 图片放大模态框 -->
+    <div class="modal" id="image-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <img id="modal-image" src="" alt="放大图片">
+            <div class="modal-info">
+                <div id="image-source">图片来源：猫咪美图画廊</div>
+                <div id="image-resolution">分辨率：1920×1080</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 动态樱花 -->
+    <div id="sakura-container"></div>
+    
+    <!-- 动态猫咪 -->
+    <div class="cat"></div>
+    
+    <script>
+        // 美图API列表
+        const apiSources = [
+            {
+                name: "综合API源",
+                apis: [
+                    // 二次元美少女
+                    { name: "二次元美少女", url: "https://api.waifu.pics/sfw/waifu", category: "anime" },
+                    { name: "二次元猫娘", url: "https://api.waifu.pics/sfw/neko", category: "anime" },
+                    // 二次元精选 (使用NSFW API的SFW版本)
+                    { name: "二次元精选", url: "https://api.waifu.pics/nsfw/waifu", category: "nsfw" },
+                    { name: "二次元精选2", url: "https://api.waifu.pics/nsfw/neko", category: "nsfw" },
+                    // 风景摄影
+                    { name: "风景摄影", url: "https://api.btstu.cn/sjbz/api.php?lx=fengjing&format=json", category: "scenery" },
+                    { name: "风景摄影2", url: "https://api.btstu.cn/sjbz/api.php?lx=dongman&format=json", category: "scenery" },
+                    // 三次元美女
+                    { name: "三次元美女", url: "https://api.btstu.cn/sjbz/api.php?lx=meizi&format=json", category: "beauty" },
+                    { name: "三次元美女2", url: "https://api.btstu.cn/sjbz/api.php?lx=mobil&format=json", category: "beauty" }
+                ]
+            },
+            {
+                name: "二次元精选源",
+                apis: [
+                    { name: "二次元美少女", url: "https://api.waifu.im/random/?selected_tags=waifu", category: "anime" },
+                    { name: "二次元猫娘", url: "https://api.waifu.im/random/?selected_tags=neko", category: "anime" },
+                    { name: "二次元精选", url: "https://api.waifu.im/random/?selected_tags=maid", category: "nsfw" },
+                    { name: "二次元精选2", url: "https://api.waifu.im/random/?selected_tags=oppai", category: "nsfw" },
+                    { name: "风景摄影", url: "https://api.pexels.com/v1/search?query=landscape&per_page=1", category: "scenery", key: true },
+                    { name: "风景摄影2", url: "https://api.pexels.com/v1/search?query=nature&per_page=1", category: "scenery", key: true },
+                    { name: "三次元美女", url: "https://api.pexels.com/v1/search?query=portrait&per_page=1", category: "beauty", key: true },
+                    { name: "三次元美女2", url: "https://api.pexels.com/v1/search?query=woman&per_page=1", category: "beauty", key: true }
+                ]
+            }
+        ];
+        
+        // 当前API源索引
+        let currentApiSourceIndex = 0;
+        let refreshCount = 0;
+        let currentImages = [];
+        
+        // DOM元素
+        const gallery = document.getElementById('gallery');
+        const refreshBtn = document.getElementById('refresh-btn');
+        const changeApiBtn = document.getElementById('change-api-btn');
+        const refreshCountElement = document.getElementById('refresh-count');
+        const categoryTabs = document.querySelectorAll('.tab');
+        const imageModal = document.getElementById('image-modal');
+        const modalImage = document.getElementById('modal-image');
+        const imageSource = document.getElementById('image-source');
+        const imageResolution = document.getElementById('image-resolution');
+        const closeModal = document.querySelector('.close-modal');
+        const sakuraContainer = document.getElementById('sakura-container');
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            createSakura();
+            loadImages();
+            
+            // 事件监听
+            refreshBtn.addEventListener('click', loadImages);
+            changeApiBtn.addEventListener('click', changeApiSource);
+            
+            // 分类标签点击事件
+            categoryTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // 移除所有active类
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    // 给当前点击的标签添加active类
+                    this.classList.add('active');
+                    
+                    // 根据分类筛选图片
+                    const category = this.getAttribute('data-category');
+                    filterImagesByCategory(category);
+                });
+            });
+            
+            // 模态框关闭事件
+            closeModal.addEventListener('click', () => {
+                imageModal.style.display = 'none';
+            });
+            
+            // 点击模态框背景关闭
+            imageModal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    imageModal.style.display = 'none';
+                }
+            });
+        });
+        
+        // 创建樱花效果
+        function createSakura() {
+            const sakuraCount = 15;
+            
+            for (let i = 0; i < sakuraCount; i++) {
+                const sakura = document.createElement('div');
+                sakura.classList.add('sakura');
+                
+                // 随机位置
+                sakura.style.left = Math.random() * 100 + 'vw';
+                
+                // 随机大小
+                const size = Math.random() * 15 + 10;
+                sakura.style.width = size + 'px';
+                sakura.style.height = size + 'px';
+                
+                // 随机颜色
+                const pinkShade = Math.floor(Math.random() * 55 + 200);
+                sakura.style.backgroundColor = `rgb(255, ${pinkShade}, ${pinkShade})`;
+                
+                // 随机动画时长
+                const duration = Math.random() * 10 + 10;
+                sakura.style.animationDuration = duration + 's';
+                
+                // 随机延迟
+                sakura.style.animationDelay = Math.random() * 5 + 's';
+                
+                sakuraContainer.appendChild(sakura);
+            }
+        }
+        
+        // 加载图片
+        async function loadImages() {
+            // 显示加载状态
+            gallery.innerHTML = '<div class="loading"><div class="loader"></div><p>正在加载精选美图...</p></div>';
+            
+            const apiSource = apiSources[currentApiSourceIndex];
+            const apis = [...apiSource.apis];
+            
+            // 随机选择10个API（可能会有重复，但没关系）
+            const selectedApis = [];
+            for (let i = 0; i < 10; i++) {
+                const randomIndex = Math.floor(Math.random() * apis.length);
+                selectedApis.push(apis[randomIndex]);
+            }
+            
+            currentImages = [];
+            const imagePromises = selectedApis.map(async (api, index) => {
+                try {
+                    let imageUrl;
+                    let imageName = api.name;
+                    
+                    // 处理需要API密钥的请求
+                    if (api.key) {
+                        // 注意：这里需要真实的Pexels API密钥，这里使用备用方案
+                        // 在实际使用中，您需要替换为真实的API密钥
+                        imageUrl = await getFallbackImage(api.category);
+                    } else {
+                        const response = await fetch(api.url);
+                        const data = await response.json();
+                        
+                        // 不同API返回的数据格式不同
+                        if (api.url.includes('waifu.pics')) {
+                            imageUrl = data.url;
+                        } else if (api.url.includes('btstu.cn')) {
+                            imageUrl = data.imgurl;
+                        } else if (api.url.includes('waifu.im')) {
+                            imageUrl = data.images[0].url;
+                        }
+                    }
+                    
+                    if (imageUrl) {
+                        currentImages.push({
+                            url: imageUrl,
+                            category: api.category,
+                            name: imageName,
+                            source: apiSource.name
+                        });
+                    }
+                } catch (error) {
+                    console.error(`加载图片失败 (${api.name}):`, error);
+                    // 如果API调用失败，使用备用图片
+                    const fallbackUrl = await getFallbackImage(api.category);
+                    currentImages.push({
+                        url: fallbackUrl,
+                        category: api.category,
+                        name: api.name + " (备用)",
+                        source: "备用图库"
+                    });
+                }
+            });
+            
+            await Promise.all(imagePromises);
+            
+            // 更新刷新次数
+            refreshCount++;
+            refreshCountElement.textContent = refreshCount;
+            
+            // 显示图片
+            displayImages(currentImages);
+        }
+        
+        // 备用图片函数
+        async function getFallbackImage(category) {
+            // 根据类别返回不同的备用图片URL
+            const fallbackImages = {
+                anime: [
+                    'https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+                    'https://images.unsplash.com/photo-1563089145-599997674d42?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'
+                ],
+                nsfw: [
+                    'https://images.unsplash.com/photo-1542744095-fcf48d80b0fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+                    'https://images.unsplash.com/photo-1542744094-3a31f272c490?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'
+                ],
+                scenery: [
+                    'https://images.unsplash.com/photo-1501854140801-50d01698950b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+                    'https://images.unsplash.com/photo-1439066615861-d1af74d74000?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'
+                ],
+                beauty: [
+                    'https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+                    'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80'
+                ]
+            };
+            
+            const images = fallbackImages[category] || fallbackImages.anime;
+            return images[Math.floor(Math.random() * images.length)];
+        }
+        
+        // 显示图片
+        function displayImages(images) {
+            gallery.innerHTML = '';
+            
+            images.forEach((image, index) => {
+                const imageCard = document.createElement('div');
+                imageCard.className = 'image-card';
+                imageCard.setAttribute('data-category', image.category);
+                
+                // 图片元素
+                const img = document.createElement('img');
+                img.src = image.url;
+                img.alt = `美图 ${index + 1}`;
+                img.loading = 'lazy';
+                
+                // 图片标签
+                const label = document.createElement('div');
+                label.className = 'image-label';
+                
+                // 根据类别显示不同图标
+                let icon = 'fas fa-image';
+                if (image.category === 'anime') icon = 'fas fa-user-ninja';
+                else if (image.category === 'nsfw') icon = 'fas fa-heart';
+                else if (image.category === 'scenery') icon = 'fas fa-mountain';
+                else if (image.category === 'beauty') icon = 'fas fa-user';
+                
+                label.innerHTML = `<i class="${icon}"></i> ${image.name}`;
+                
+                // 点击放大图片
+                imageCard.addEventListener('click', () => {
+                    openImageModal(image);
+                });
+                
+                imageCard.appendChild(img);
+                imageCard.appendChild(label);
+                gallery.appendChild(imageCard);
+            });
+        }
+        
+        // 根据分类筛选图片
+        function filterImagesByCategory(category) {
+            if (category === 'all') {
+                displayImages(currentImages);
+                return;
+            }
+            
+            const filteredImages = currentImages.filter(image => image.category === category);
+            displayImages(filteredImages);
+        }
+        
+        // 切换API源
+        function changeApiSource() {
+            currentApiSourceIndex = (currentApiSourceIndex + 1) % apiSources.length;
+            const apiSourceName = apiSources[currentApiSourceIndex].name;
+            
+            // 显示通知
+            showNotification(`已切换到: ${apiSourceName}`);
+            
+            // 重新加载图片
+            loadImages();
+        }
+        
+        // 打开图片模态框
+        function openImageModal(image) {
+            modalImage.src = image.url;
+            imageSource.textContent = `图片来源：${image.source} - ${image.name}`;
+            imageResolution.textContent = `分类：${getCategoryName(image.category)}`;
+            
+            imageModal.style.display = 'flex';
+        }
+        
+        // 获取分类名称
+        function getCategoryName(category) {
+            const categoryNames = {
+                anime: '二次元美少女',
+                nsfw: '二次元精选',
+                scenery: '风景摄影',
+                beauty: '三次元美女'
+            };
+            
+            return categoryNames[category] || '未知分类';
+        }
+        
+        // 显示通知
+        function showNotification(message) {
+            // 创建通知元素
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #ff9e6d;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 50px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+                z-index: 1000;
+                font-weight: bold;
+                animation: fadeInOut 3s ease-in-out;
+            `;
+            
+            notification.textContent = message;
+            
+            // 添加动画样式
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeInOut {
+                    0% { opacity: 0; top: 10px; }
+                    10% { opacity: 1; top: 20px; }
+                    90% { opacity: 1; top: 20px; }
+                    100% { opacity: 0; top: 10px; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(notification);
+            
+            // 3秒后移除通知
+            setTimeout(() => {
+                notification.remove();
+                style.remove();
+            }, 3000);
+        }
+        
+        // 初始加载图片
+        loadImages();
+    </script>
+</body>
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>🌸grok写的 🌸🐱</title>
+    <!-- 可爱手写字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+    <style>
+        /* ==================== 全局基础样式 ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Patrick Hand', 'Kalam', cursive;
+            background: linear-gradient(135deg, #ffeef8 0%, #fff0f8 50%, #f8e8ff 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            color: #ff66aa;
+            text-align: center;
+        }
+
+        h1 {
+            padding: 20px 10px;
+            font-size: 2.2em;
+            text-shadow: 2px 2px 4px rgba(255, 102, 170, 0.3);
+            margin-bottom: 10px;
+        }
+
+        /* ==================== 樱花飘落动画 ==================== */
+        @keyframes sakura-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        .petal {
+            position: absolute;
+            top: -10%;
+            width: 20px;
+            height: 20px;
+            background: url('https://s1.ax1x.com/2023/05/15/p9X0Jq0.png') no-repeat center/contain; /* 樱花瓣透明图 */
+            pointer-events: none;
+            animation: sakura-fall linear infinite;
+        }
+
+        /* 多瓣变体 */
+        .petal:nth-child(odd) { animation-duration: 12s; }
+        .petal:nth-child(even) { animation-duration: 18s; }
+        .petal:nth-child(3n) { animation-duration: 15s; width: 25px; height: 25px; }
+        .petal:nth-child(4n) { animation-duration: 20s; }
+
+        /* ==================== 可爱猫咪装饰 ==================== */
+        .cat-deco {
+            position: fixed;
+            width: 80px;
+            height: 80px;
+            background: url('https://s1.ax1x.com/2023/05/15/p9X0abc.png') no-repeat center/contain; /* 可爱猫咪贴图 */
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0.8;
+        }
+
+        .cat-left { bottom: 10%; left: 5%; transform: scaleX(-1); }
+        .cat-right { bottom: 15%; right: 5%; }
+        .cat-top { top: 15%; left: 50%; transform: translateX(-50%); }
+
+        /* ==================== 加载动画 ==================== */
+        #loading {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 0.5s;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #ffccdd;
+            border-top: 6px solid #ff66aa;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ==================== 图片网格 ==================== */
+        #gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+            padding: 10px;
+            max-width: 100%;
+        }
+
+        #gallery img {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(255, 102, 170, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            object-fit: cover;
+            aspect-ratio: 3/4;
+        }
+
+        #gallery img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(255, 102, 170, 0.5);
+        }
+
+        /* ==================== Lightbox 大图查看 ==================== */
+        #lightbox {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 99;
+            padding: 20px;
+        }
+
+        #lightbox img {
+            max-width: 95%;
+            max-height: 95%;
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+        }
+
+        /* ==================== 刷新按钮 ==================== */
+        #refresh-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 30px;
+            background: #ff66aa;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.2em;
+            box-shadow: 0 4px 15px rgba(255, 102, 170, 0.4);
+            cursor: pointer;
+            z-index: 20;
+        }
+
+        /* ==================== 响应式优化 ==================== */
+        @media (max-width: 480px) {
+            #gallery {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                padding: 8px;
+            }
+            h1 { font-size: 1.8em; }
+        }
+
+        /* ==================== 更多装饰粒子（星星/爱心） ==================== */
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .particle {
+            position: absolute;
+            font-size: 20px;
+            pointer-events: none;
+            animation: twinkle 3s infinite;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌸🐱 每日可爱美图画廊 🐱🌸</h1>
+
+    <!-- 加载遮罩 -->
+    <div id="loading">
+        <div class="spinner"></div>
+        <p style="margin-top:20px; font-size:1.4em;">加载中喵～请稍等(≧▽≦)</p>
+    </div>
+
+    <!-- 图片网格 -->
+    <div id="gallery"></div>
+
+    <!-- Lightbox -->
+    <div id="lightbox">
+        <img id="lightbox-img" src="" alt="大图">
+    </div>
+
+    <!-- 刷新按钮 -->
+    <button id="refresh-btn">🔄 刷新换一批</button>
+
+    <!-- 可爱猫咪装饰 -->
+    <div class="cat-deco cat-left"></div>
+    <div class="cat-deco cat-right"></div>
+    <div class="cat-deco cat-top"></div>
+
+    <script>
+        // ==================== API 配置 ====================
+        const apiList = [
+            // 二次元美少女 SFW
+            () => fetch('https://api.waifu.pics/sfw/waifu').then(r => r.json()).then(j => j.url).catch(() => 'https://s1.ax1x.com/2023/05/15/p9X0cat.png'),
+            () => fetch('https://api.waifu.pics/sfw/neko').then(r => r.json()).then(j => j.url).catch(() => 'https://s1.ax1x.com/2023/05/15/p9X0cat.png'),
+
+            // 二次元涩图 NSFW
+            () => fetch('https://api.waifu.pics/nsfw/waifu').then(r => r.json()).then(j => j.url).catch(() => 'https://s1.ax1x.com/2023/05/15/p9X0cat.png'),
+            () => fetch('https://api.waifu.pics/nsfw/neko').then(r => r.json()).then(j => j.url).catch(() => 'https://s1.ax1x.com/2023/05/15/p9X0cat.png'),
+
+            // 三次元风景/美景
+            () => `https://source.unsplash.com/random/800x1200/?nature,landscape&sig=${Math.random()}`,
+            () => `https://source.unsplash.com/random/800x1200/?sunset,ocean&sig=${Math.random()}`,
+            () => `https://picsum.photos/800/1200?random=${Date.now()}`,
+
+            // 三次元美女
+            () => `https://source.unsplash.com/random/800x1200/?portrait,woman&sig=${Math.random()}`,
+            () => `https://source.unsplash.com/random/800x1200/?beautiful,girl&sig=${Math.random()}`,
+
+            // 三次元涩图（真实成人）
+            () => fetch('https://nekobot.xyz/api/image?type=ass').then(r => r.json()).then(j => j.message).catch(() => 'https://s1.ax1x.com/2023/05/15/p9X0cat.png'),
+            () => fetch('https://nekobot.xyz/api/image?type=boobs').then(r => r.json()).then(j => j.message).catch(() => 'https://s1.ax1x.com/2023/05/15/p9X0cat.png'),
+            () => fetch('https://nekobot.xyz/api/image?type=gonewild').then(r => r.json()).then(j => j.message).catch(() => 'https://s1.ax1x.com/2023/05/15/p9X0cat.png'),
+        ];
+
+        // ==================== 生成樱花瓣 ====================
+        function createPetals(count = 35) {
+            const body = document.body;
+            for (let i = 0; i < count; i++) {
+                const petal = document.createElement('div');
+                petal.className = 'petal';
+                petal.style.left = `${Math.random() * 100}vw`;
+                petal.style.animationDelay = `${Math.random() * 20}s`;
+                petal.style.animationDuration = `${10 + Math.random() * 15}s`;
+                body.appendChild(petal);
+            }
+        }
+
+        // ==================== 生成星星/爱心粒子 ====================
+        function createParticles(count = 20) {
+            const symbols = ['💖', '⭐', '🌸', '🐾', '✨'];
+            const body = document.body;
+            for (let i = 0; i < count; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                p.style.left = `${Math.random() * 100}vw`;
+                p.style.top = `${Math.random() * 100}vh`;
+                p.style.animationDelay = `${Math.random() * 3}s`;
+                body.appendChild(p);
+            }
+        }
+
+        // ==================== 加载 25 张图片 ====================
+        async function loadImages() {
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = '';
+            const promises = [];
+
+            for (let i = 0; i < 25; i++) {
+                // 随机选择 API（保证多样性）
+                const apiFn = apiList[Math.floor(Math.random() * apiList.length)];
+                promises.push(apiFn());
+            }
+
+            const results = await Promise.allSettled(promises);
+
+            results.forEach(result => {
+                const url = result.status === 'fulfilled' ? result.value : 'https://s1.ax1x.com/2023/05/15/p9X0cat.png'; // 回退可爱猫图
+                const img = document.createElement('img');
+                img.src = url;
+                img.loading = 'lazy';
+                img.alt = '美图';
+                img.onclick = () => {
+                    document.getElementById('lightbox-img').src = url;
+                    document.getElementById('lightbox').style.display = 'flex';
+                };
+                gallery.appendChild(img);
+            });
+
+            document.getElementById('loading').style.opacity = '0';
+            setTimeout(() => document.getElementById('loading').style.display = 'none', 500);
+        }
+
+        // ==================== Lightbox 关闭 ====================
+        document.getElementById('lightbox').onclick = () => {
+            document.getElementById('lightbox').style.display = 'none';
+        };
+
+        // ==================== 刷新按钮 ====================
+        document.getElementById('refresh-btn').onclick = () => {
+            document.getElementById('loading').style.display = 'flex';
+            document.getElementById('loading').style.opacity = '1';
+            loadImages();
+        };
+
+        // ==================== 初始化 ====================
+        window.onload = () => {
+            createPetals(35);
+            createParticles(25);
+            loadImages();
+        };
+    </script>
+</body>
+</html>
