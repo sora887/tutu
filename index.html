@@ -5,14 +5,71 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>随机美图</title>
     <style>
-        body { font-family: sans-serif; text-align: center; background: linear-gradient(#ffe4e1, #e0ffe0); padding: 40px; color: #333; }
-        h1 { font-size: 2.5em; color: #ff69b4; margin-bottom: 40px; }
-        ul { list-style: none; padding: 0; max-width: 600px; margin: 0 auto; }
-        li { margin: 20px 0; }
-        a { display: block; padding: 20px; background: white; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); font-size: 1.3em; text-decoration: none; color: #4169e1; transition: all 0.3s; }
-        a:hover { transform: scale(1.05); color: #ff1493; }
-        .recommend { font-weight: bold; color: #ff1493; font-size: 1.4em; } /* 推荐强调 */
-        .disclaimer { margin-top: 60px; font-size: 0.9em; color: #666; }
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            background: linear-gradient(#ffe4e1, #e0ffe0);
+            padding: 40px 20px;
+            color: #333;
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+        h1 {
+            font-size: 2.6em;
+            color: #ff69b4;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        h1::before { content: "🐱"; margin-right: 10px; }
+        h1::after { content: "❤️"; margin-left: 10px; }
+
+        ul { list-style: none; padding: 0; max-width: 620px; margin: 0 auto; }
+        li { margin: 18px 0; }
+
+        a {
+            display: block;
+            padding: 22px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(255,105,180,0.25);
+            font-size: 1.32em;
+            text-decoration: none;
+            color: #4169e1;
+            transition: all 0.35s;
+            position: relative;
+        }
+        a:hover {
+            transform: scale(1.08) translateY(-4px);
+            box-shadow: 0 15px 30px rgba(255,105,180,0.4);
+            color: #ff1493;
+        }
+        .recommend {
+            font-weight: bold;
+            color: #ff1493;
+            font-size: 1.42em;
+        }
+
+        /* 可爱樱花飘落 */
+        .sakura {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.75;
+            animation: fall 8s linear infinite;
+            z-index: -1;
+            pointer-events: none;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-120vh) rotate(0deg); }
+            100% { transform: translateY(120vh) rotate(720deg); }
+        }
+
+        .disclaimer {
+            margin-top: 70px;
+            font-size: 0.9em;
+            color: #666;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
@@ -23,11 +80,18 @@
         <li><a href="grok.HTML">二次元美涩图三次涩图</a></li>
         <li><a class="recommend" href="kimi.HTML">二次美涩三次摄影涩图（推荐）</a></li>
         <li><a class="recommend" href="yuanbao.html">摄影美图专攻（推荐）</a></li>
-        <!-- 新增的第六个按钮 ↓↓↓ -->
         <li><a href="https://t.alcy.cc" target="_blank">栗次元api</a></li>
     </ul>
     <div class="disclaimer">
         本页面仅供个人交流与学习欣赏使用，所有图片来源于网络公开API随机获取，版权归原作者或来源所有。如有侵权，请联系删除。本站不存储任何图片，仅提供展示。
     </div>
+
+    <!-- 樱花粒子（5个就够了，手机不卡） -->
+    <div class="sakura" style="left:10%; animation-delay:0s;">🌸</div>
+    <div class="sakura" style="left:25%; animation-delay:2s;">🌺</div>
+    <div class="sakura" style="left:45%; animation-delay:1.5s;">🐱</div>
+    <div class="sakura" style="left:65%; animation-delay:3s;">❤️</div>
+    <div class="sakura" style="left:85%; animation-delay:0.8s;">🌸</div>
+
 </body>
 </html>
